@@ -1,0 +1,30 @@
+{
+  "name": "alexa-skill-for-ordering-food",
+  "version": "0.0.1",
+  "description": "Alexa skill for ordering food from vendors such as skipthedishes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeterMengQiWu/alexa-skill-for-ordering-food.git"
+  },
+  "keywords": [
+    "Alexa"
+  ],
+  "author": "Mengqi Wu, Anthony Lai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PeterMengQiWu/alexa-skill-for-ordering-food/issues"
+  },
+  "homepage": "https://github.com/PeterMengQiWu/alexa-skill-for-ordering-food#readme",
+  "dependencies": {
+    "ask-sdk": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.14",
+    "typescript": "^3.7.2"
+  }
+}
