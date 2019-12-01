@@ -1,0 +1,169 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Stack for Alexa skill for ordering food",
+    "Parameters": {
+        "FunctionName": {
+            "Description": "Lambda Function name for alexa skill function",
+            "Type": "String",
+            "Default": "alexa-order-food-skill-function"
+        },
+        "BucketName": {
+            "Description": "The S3 bucket where the Lambda Function's code resides",
+            "Type": "String",
+            "Default": "alexa-order-food-skill-bucket"
+        },
+        "PackagePath": {
+            "Description": "The Path within the S3 bucket to the zipped node.js package",
+            "Type": "String",
+            "Default": "alexa-order-food-skill-function.zip"
+        },
+        "AlexaSkillID": {
+            "Description": "Alexa Skill ID from developer console",
+            "Type": "String",
+            "Default": "amzn1.ask.skill.8e4bca37-7441-44bb-9057-b47e0a0e49c6"
+        }
+    },
+    "Mappings": {},
+    "Metadata": {},
+    "Resources": {
+        "AlexaSkillBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": {
+                    "Ref": "BucketName"
+                },
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                            },
+                            "Action": "s3:GetObject",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "BucketName"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref": "PackagePath"
+                                        }
+                                    ]
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "LambdaFunctionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "\/",
+                "Policies": [
+                    {
+                        "PolicyName": "AlexaSkillCloudWatchLogsAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "AllowLogging",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "AlexaSkillFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "FunctionName"
+                },
+                "Handler": "index.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionRole",
+                        "Arn"
+                    ]
+                },
+                "Description": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "Alexa Skill code for the ",
+                            {
+                                "Ref": "FunctionName"
+                            },
+                            " skill."
+                        ]
+                    ]
+                },
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "BucketName"
+                    },
+                    "S3Key": {
+                        "Ref": "PackagePath"
+                    }
+                },
+                "Runtime": "nodejs10.x",
+                "Timeout": "10"
+            }
+        },
+        "AlexaSkillFunctionPermissions": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "AlexaSkillFunction"
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "alexa-appkit.amazon.com",
+                "EventSourceToken": {
+                    "Ref": "AlexaSkillID"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "FunctionARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "AlexaSkillFunction",
+                    "Arn"
+                ]
+            },
+            "Description": "Lambda function ARN to be placed in the Amazon Developer Portal"
+        }
+    }
+}

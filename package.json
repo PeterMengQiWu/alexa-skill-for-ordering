@@ -3,9 +3,17 @@
   "version": "0.0.1",
   "description": "Alexa skill for ordering food from vendors such as skipthedishes",
   "main": "index.js",
+  "config": {
+    "zipname": "alexa-order-food-skill-function.zip",
+    "bucket": "alexa-order-food-skill-bucket"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install"
+    "install": "npm install",
+    "build": "tsc --project .",
+    "watch": "tsc --project . --watch",
+    "package": "7z a -r ./build/%npm_package_config_zipname% ./build/*.js ./node_modules",
+    "deploy": "aws s3api put-object --body ./build/%npm_package_config_zipname% --bucket %npm_package_config_bucket% --key %npm_package_config_zipname%"
   },
   "repository": {
     "type": "git",

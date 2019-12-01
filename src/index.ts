@@ -1,5 +1,5 @@
-import * as Alexa from 'ask-sdk';
-import { HandlerInput, RequestHandler } from 'ask-sdk-core';
+// import * as Alexa from 'ask-sdk';
+import { HandlerInput, RequestHandler, SkillBuilders } from 'ask-sdk-core';
 import { Response } from 'ask-sdk-model';
 
 const OrderFoodHandler: RequestHandler = {
@@ -19,10 +19,9 @@ const OrderFoodHandler: RequestHandler = {
 }
 
 exports.handler = async (event) => {
-    // TODO implement
-    const response = {
-        statusCode: 200,
-        body: JSON.stringify('Hello from Lambda!'),
-    };
-    return response;
+    const skill = SkillBuilders.custom()
+        .addRequestHandlers(
+            OrderFoodHandler
+        ).create();
+    return skill;
 };
