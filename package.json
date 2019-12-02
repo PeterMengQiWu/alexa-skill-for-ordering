@@ -5,15 +5,18 @@
   "main": "index.js",
   "config": {
     "zipname": "alexa-order-food-skill-function.zip",
-    "bucket": "alexa-order-food-skill-bucket"
+    "bucket": "alexa-order-food-skill-bucket",
+    "functionname": "alexa-order-food-skill-function"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "npm install",
     "build": "tsc --project .",
     "watch": "tsc --project . --watch",
-    "package": "7z a -r ./build/%npm_package_config_zipname% ./build/*.js ./node_modules",
-    "deploy": "aws s3api put-object --body ./build/%npm_package_config_zipname% --bucket %npm_package_config_bucket% --key %npm_package_config_zipname%"
+    "package": "npm run build && 7z a -r ./build/%npm_package_config_zipname% ./build/*.js ./node_modules",
+    "deploy": "npm run package && aws s3api put-object --body ./build/%npm_package_config_zipname% --bucket %npm_package_config_bucket% --key %npm_package_config_zipname%",
+    "update": "aws lambda update-function-code --function-name %npm_package_config_functionname% --s3-bucket %npm_package_config_bucket% --s3-key %npm_package_config_zipname%",
+    "release": "npm run deploy && npm run update"
   },
   "repository": {
     "type": "git",
